@@ -5,7 +5,7 @@ FROM openjdk:17-jdk-slim
 WORKDIR /app
 
 # Copy the specific JAR file and rename it to app.jar inside the container
-COPY target/HRM-0.0.1-SNAPSHOT.jar.original app.jar
+COPY target/HRM-0.0.1-SNAPSHOT.jar.original
 
 # Expose the port your app runs on (adjust if different)
 EXPOSE 8080
