@@ -1,13 +1,13 @@
 # Use an OpenJDK base image
 FROM openjdk:17-jdk-slim
 
-# Set the working directory inside the container
+# Set working directory inside container
 WORKDIR /app
 
-# Copy the packaged JAR file into the container
-COPY target/*.jar app.jar
+# Copy the specific JAR file and rename it to app.jar inside the container
+COPY target/HRM-0.0.1-SNAPSHOT.jar.original app.jar
 
-# Expose the port your app runs on (adjust if not 8080)
+# Expose the port your app runs on (adjust if different)
 EXPOSE 8080
 
 # Run the JAR file
