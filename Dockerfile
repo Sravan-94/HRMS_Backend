@@ -6,14 +6,17 @@ WORKDIR /app
 COPY pom.xml mvnw ./
 COPY .mvn .mvn
 
-# Pre-fetch dependencies (optional, speeds up builds)
+# Fix: Make mvnw executable
+RUN chmod +x mvnw
+
+# Pre-fetch dependencies
 RUN ./mvnw dependency:go-offline
 
-# Copy the rest of the source code
+# Copy source code
 COPY src src
 
-# Build the JAR file
-RUN mvn clean package -DskipTests
+# Build the JAR
+RUN ./mvnw clean package -DskipTests
 
 # Stage 2: Run the app
 FROM eclipse-temurin:17
@@ -22,8 +25,8 @@ WORKDIR /app
 # Copy the built JAR from stage 1
 COPY --from=build /app/target/HRM-0.0.1-SNAPSHOT.jar app.jar
 
-# Expose port 8080
+# Expose port
 EXPOSE 8080
 
-# Run the application
+# Run the app
 ENTRYPOINT ["java", "-jar", "app.jar"]
