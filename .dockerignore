@@ -1,0 +1,23 @@
+# Maven output directory
+target/
+
+# Logs
+*.log
+
+# OS or IDE files
+.DS_Store
+.idea/
+*.iml
+*.class
+
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile
+.dockerignore
+
+# Environment/config files (optional - only if not needed in image)
+.env
+*.swp

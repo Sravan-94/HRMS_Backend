@@ -1,27 +1,31 @@
-# Stage 1: Build the application
-FROM maven:3.9.5-eclipse-temurin-17 AS build
-
+# Stage 1: Build the JAR
+FROM maven:3.9.6-eclipse-temurin-17 AS build
 WORKDIR /app
 
-# Copy pom.xml and download dependencies
-COPY pom.xml .
-RUN mvn dependency:go-offline
+# Copy Maven wrapper files (important!)
+COPY mvnw pom.xml ./
+COPY .mvn .mvn
 
-# Copy source code
-COPY src ./src
+# Make wrapper executable
+RUN chmod +x mvnw
 
-# Package the application
-RUN mvn clean package -DskipTests
+# Pre-fetch dependencies
+RUN ./mvnw dependency:go-offline
 
-# Stage 2: Run the application
+# Copy the rest of the project (including /src)
+COPY src src
+
+# Build the JAR
+RUN ./mvnw clean package -DskipTests
+
+# Stage 2: Run the app
 FROM eclipse-temurin:17-jdk-jammy
-
 WORKDIR /app
 
-# Copy the jar from the build stage
-COPY target/HRM-0.0.1-SNAPSHOT.jar app.jar
+# Copy the JAR built in Stage 1
+COPY --from=build /app/target/HRM-0.0.1-SNAPSHOT.jar app.jar
 
-# Expose the port the app runs on (change if your app uses a different one)
+# Expose app port
 EXPOSE 8080
 
 # Run the app
