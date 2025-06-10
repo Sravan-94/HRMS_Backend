@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -80,19 +81,20 @@ public class AttendanceService {
             ).toMinutes() / 60;
         }
 
-        return new AttendanceDTO(
-            attendance.getId(),
-            attendance.getEmployee().getEmpId(),
-            attendance.getEmployee().getEname(),
-            attendance.getDate(),
-            attendance.getClockIn(),
-            attendance.getClockOut(),
-            hoursWorked,
-            attendance.getStatus(),
-            attendance.getLocation(),
-            attendance.getSetCheckInImageUrl(),
-            attendance.getSetCheckOutImageUrl()
-        );
+        AttendanceDTO dto = new AttendanceDTO();
+        dto.setId(attendance.getId());
+        dto.setEmployeeId(attendance.getEmployee().getEmpId());
+        dto.setEmployeeName(attendance.getEmployee().getEname());
+        dto.setDate(attendance.getDate());
+        dto.setClockIn(attendance.getClockIn());
+        dto.setClockOut(attendance.getClockOut());
+        dto.setHoursWorked(hoursWorked);
+        dto.setStatus(attendance.getStatus());
+        dto.setLocation(attendance.getLocation());
+        dto.setCheckInImageUrl(attendance.getSetCheckInImageUrl());
+        dto.setCheckOutImageUrl(attendance.getSetCheckOutImageUrl());
+
+        return dto;
     }
 
     public Attendance checkOut(Long recordId, MultipartFile file) throws IOException {
@@ -129,9 +131,34 @@ public class AttendanceService {
     }
 
     // Get specific employee record on a given date
-    public Attendance getRecordByEmployeeAndDate(Employee employee, LocalDate date) {
-        return attendanceRecordRepository.findByEmployeeAndDate(employee, date);
+//    public List<Attendance> getRecordByEmployeeAndDate(Employee employee, LocalDate date) {
+//        return attendanceRecordRepository.findByEmployeeAndDate(employee, date);
+//    }
+    
+    
+    
+    
+    public List<AttendanceDTO> getRecordByEmployeeAndDate(Employee employee, LocalDate date) {
+        List<Attendance> records = attendanceRecordRepository.findByEmployeeAndDate(employee, date);
+        
+        return records.stream().map(record -> {
+        	AttendanceDTO dto = new AttendanceDTO();
+        	
+            dto.setId(record.getId());
+            dto.setEmployeeId(record.getEmployee().getEmpId());
+            dto.setEmployeeName(record.getEmployee().getEname());
+            dto.setDate(record.getDate());
+            dto.setClockIn(record.getClockIn());
+            dto.setClockOut(record.getClockOut());
+            
+            dto.setStatus(record.getStatus());
+            dto.setLocation(record.getLocation());
+            dto.setCheckInImageUrl(record.getSetCheckInImageUrl());
+            dto.setCheckOutImageUrl(record.getSetCheckOutImageUrl());
+            return dto;
+        }).collect(Collectors.toList());
     }
+
 
     // Get all records for an employee within a date range (for weekly summary)
     public List<Attendance> getWeeklyRecords(Employee employee, LocalDate startDate, LocalDate endDate) {

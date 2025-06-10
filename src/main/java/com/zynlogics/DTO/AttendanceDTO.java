@@ -3,12 +3,12 @@ package com.zynlogics.DTO;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import com.zynlogics.Entity.Attendance;
 
-import lombok.AllArgsConstructor;
+
+
 import lombok.Data;
 @Data
-@AllArgsConstructor
+
 public class AttendanceDTO {
 	private Long id;
     private Integer employeeId;         // You can replace with String if you're using email or something else

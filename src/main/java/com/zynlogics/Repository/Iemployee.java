@@ -14,8 +14,5 @@ public interface Iemployee extends JpaRepository<Employee,Integer> , CrudReposit
 	Optional<Employee> findByEmailAndPassword(String email, String password);
 	Optional<Employee> findById(Integer empId);
 
-	
-
-
 }
 

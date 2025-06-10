@@ -94,13 +94,13 @@ public class AttendanceController {
 
     // Get record by employee and date: GET /api/attendance/record/{userId}/{date}
     @GetMapping("/record/{userId}/{date}")
-    public ResponseEntity<Attendance> getRecordByEmployeeAndDate(
+    public ResponseEntity<List<AttendanceDTO>> getRecordByEmployeeAndDate(
             @PathVariable Integer userId,
             @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
 
         Employee employee = new Employee();
         employee.setEmpId(userId);
-        Attendance record = attendanceService.getRecordByEmployeeAndDate(employee, date);
+        List<AttendanceDTO> record = attendanceService.getRecordByEmployeeAndDate(employee, date);
         return ResponseEntity.ok(record);
     }
 
@@ -158,36 +158,51 @@ public class AttendanceController {
         Employee employee = new Employee();
         employee.setEmpId(empId);
 
-        // Fetch the attendance record for today for this employee
         LocalDate today = LocalDate.now();
-        Attendance record = attendanceService.getRecordByEmployeeAndDate(employee, today);
+        List<AttendanceDTO> records = attendanceService.getRecordByEmployeeAndDate(employee, today);
 
         Map<String, Object> status = new HashMap<>();
 
-        if (record != null && record.getClockOut() == null) {
-            // Employee is currently checked in
-            status.put("isLoggedIn", true);
-            status.put("loginTime", record.getClockIn().toString());
-            status.put("loginImage", record.getSetCheckInImageUrl());
-            status.put("logoutTime", null);
-            status.put("logoutImage", null);
-            // Calculate timeLeft (assuming a 9-hour workday)
-            long secondsSinceCheckIn = ChronoUnit.SECONDS.between(record.getClockIn(), LocalDateTime.now());
-            long totalWorkdaySeconds = 9 * 60 * 60; // 9 hours in seconds
-            long timeLeftSeconds = Math.max(0, totalWorkdaySeconds - secondsSinceCheckIn);
-            status.put("timeLeft", (int) timeLeftSeconds);
-            status.put("record", record);
-            return ResponseEntity.ok(status);
+        if (records != null && !records.isEmpty()) {
+            // Assume we take the latest (or first) record
+            AttendanceDTO record = records.get(0);
+
+            if (record.getClockOut() == null) {
+                // Employee is currently checked in
+                status.put("isLoggedIn", true);
+                status.put("loginTime", record.getClockIn().toString());
+                status.put("loginImage", record.getCheckInImageUrl());
+                status.put("logoutTime", null);
+                status.put("logoutImage", null);
+
+                long secondsSinceCheckIn = ChronoUnit.SECONDS.between(record.getClockIn(), LocalDateTime.now());
+                long totalWorkdaySeconds = 9 * 60 * 60;
+                long timeLeftSeconds = Math.max(0, totalWorkdaySeconds - secondsSinceCheckIn);
+
+                status.put("timeLeft", (int) timeLeftSeconds);
+                status.put("record", record);
+            } else {
+                // Already clocked out
+                status.put("isLoggedIn", false);
+                status.put("loginTime", record.getClockIn().toString());
+                status.put("loginImage", record.getCheckInImageUrl());
+                status.put("logoutTime", record.getClockOut().toString());
+                status.put("logoutImage", record.getCheckOutImageUrl());
+                status.put("timeLeft", 0);
+                status.put("record", record);
+            }
         } else {
-            // Employee is not checked in
+            // No record for today
             status.put("isLoggedIn", false);
             status.put("loginTime", null);
             status.put("loginImage", null);
-            status.put("logoutTime", record != null ? record.getClockOut().toString() : null);
-            status.put("logoutImage", record != null ? record.getSetCheckOutImageUrl() : null);
-            status.put("timeLeft", 9 * 60 * 60); // Reset to 9 hours
-            status.put("record", record);
-            return ResponseEntity.ok(status);
+            status.put("logoutTime", null);
+            status.put("logoutImage", null);
+            status.put("timeLeft", 9 * 60 * 60);
+            status.put("record", null);
         }
+
+        return ResponseEntity.ok(status);
     }
+
 }

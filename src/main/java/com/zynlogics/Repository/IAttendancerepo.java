@@ -20,7 +20,7 @@ import jakarta.transaction.Transactional;
 @Transactional
 public interface IAttendancerepo extends JpaRepository<Attendance, Long> {
 
-    Attendance findByEmployeeAndDate(Employee employee, LocalDate date);
+    List<Attendance> findByEmployeeAndDate(Employee employee, LocalDate date);
 
 	List<Attendance> findByEmployee(Employee employee);
 
