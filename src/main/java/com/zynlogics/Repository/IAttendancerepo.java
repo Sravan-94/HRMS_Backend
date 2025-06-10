@@ -33,6 +33,9 @@ public interface IAttendancerepo extends JpaRepository<Attendance, Long> {
 	long countByDateAndLocation(LocalDate date, String location);
 	
 	List<Attendance> findByEmployeeEmpId(Integer empId);
+	
+	List<Attendance> findByEmployeeEmpIdOrderByDateDesc(Integer empId);
+
 }
 
 

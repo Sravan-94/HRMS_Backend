@@ -186,11 +186,23 @@ public class AttendanceService {
     }
 
     // Fix: Implement getRecordsByEmpId to fetch records by empId directly
-    public List<Attendance> getRecordsByEmpId(Integer userId) {
+    public List<AttendanceDTO> getRecordsByEmpId(Integer userId) {
         List<Attendance> records = attendanceRecordRepository.findByEmployeeEmpId(userId);
         System.out.println("Records found for empId " + userId + ": " + records.size()); // Debug log
-        return records;
+
+        return records.stream()
+            .map(this::convertToDTO)
+            .collect(Collectors.toList());
     }
+
+    
+    
+    
+    
+    
+  
+
+    
 
     // Remove the old stub method with incorrect signature
     // public List<Attendance> getRecordsByEmployee(Integer userId) {

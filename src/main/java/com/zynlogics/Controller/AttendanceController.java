@@ -75,13 +75,11 @@ public class AttendanceController {
 //    }
     
     @GetMapping("/employee/{userId}")
-    public ResponseEntity<List<Attendance>> getRecordsByEmployee(@PathVariable Integer userId) {
-        List<Attendance> records = attendanceService.getRecordsByEmpId(userId);
-        if (records.isEmpty()) {
-            System.out.println("No records found for userId: " + userId); // Debug log
-        }
+    public ResponseEntity<List<AttendanceDTO>> getRecordsByEmployee(@PathVariable Integer userId) {
+        List<AttendanceDTO> records = attendanceService.getRecordsByEmpId(userId);
         return ResponseEntity.ok(records);
     }
+
     
 
     // Get attendance records by date: GET /api/attendance/date/{date}

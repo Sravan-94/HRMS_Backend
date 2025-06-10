@@ -2,9 +2,9 @@ package com.zynlogics.DTO;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
-
-
+import com.zynlogics.Entity.Attendance;
 
 import lombok.Data;
 @Data
@@ -21,4 +21,5 @@ public class AttendanceDTO {
     private String location;
     private String checkInImageUrl;
     private String checkOutImageUrl;
+	
 }
