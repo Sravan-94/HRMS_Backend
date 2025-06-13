@@ -8,24 +8,27 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
 import lombok.Data;
+
 @Entity
 @Data
-@Table(name="CompenyDocuments")
 public class DocumentsCompeny {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer docId;
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	 private Integer docId;
-	 private String PaySlips;
-	 private String pf;
-	 private String form16;
-	 private LocalDateTime uploadDateTime;
-	 
-	 @ManyToOne
-	    @JoinColumn(name = "employee_id")
-	    private Employee employee;
-	
+    @ManyToOne
+    @JoinColumn(name = "emp_id")
+    private Employee employee;
+
+    private String paySlips;
+
+    private String pf;
+
+    private String form16;
+
+    private LocalDateTime uploadDateTime;
+
+    // Getters and setters
 
 }

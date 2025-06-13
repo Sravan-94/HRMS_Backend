@@ -119,7 +119,8 @@ public class AttendanceService {
     public List<Attendance> getAllRecords() {
         return attendanceRecordRepository.findAll();
     }
-
+    
+    
     // Get records by employee
     public List<Attendance> getRecordsByEmployee(Employee employee) {
         return attendanceRecordRepository.findByEmployee(employee);
@@ -130,36 +131,9 @@ public class AttendanceService {
         return attendanceRecordRepository.findByDate(date);
     }
 
-    // Get specific employee record on a given date
-//    public List<Attendance> getRecordByEmployeeAndDate(Employee employee, LocalDate date) {
-//        return attendanceRecordRepository.findByEmployeeAndDate(employee, date);
-//    }
-    
-    
-    
-    
-    public List<AttendanceDTO> getRecordByEmployeeAndDate(Employee employee, LocalDate date) {
-        List<Attendance> records = attendanceRecordRepository.findByEmployeeAndDate(employee, date);
-        
-        return records.stream().map(record -> {
-        	AttendanceDTO dto = new AttendanceDTO();
-        	
-            dto.setId(record.getId());
-            dto.setEmployeeId(record.getEmployee().getEmpId());
-            dto.setEmployeeName(record.getEmployee().getEname());
-            dto.setDate(record.getDate());
-            dto.setClockIn(record.getClockIn());
-            dto.setClockOut(record.getClockOut());
-            
-            dto.setStatus(record.getStatus());
-            dto.setLocation(record.getLocation());
-            dto.setCheckInImageUrl(record.getSetCheckInImageUrl());
-            dto.setCheckOutImageUrl(record.getSetCheckOutImageUrl());
-            return dto;
-        }).collect(Collectors.toList());
-    }
 
-
+    
+    
     // Get all records for an employee within a date range (for weekly summary)
     public List<Attendance> getWeeklyRecords(Employee employee, LocalDate startDate, LocalDate endDate) {
         return attendanceRecordRepository.findByEmployeeAndDateBetween(employee, startDate, endDate);
@@ -194,6 +168,37 @@ public class AttendanceService {
             .map(this::convertToDTO)
             .collect(Collectors.toList());
     }
+
+    public List<AttendanceDTO> getByEmployeeAndDate(Employee employee, LocalDate date) {
+        List<Attendance> records = attendanceRecordRepository.findByEmployeeAndDate(employee, date);
+
+        return records.stream().map(record -> {
+            AttendanceDTO dto = new AttendanceDTO();
+
+            dto.setId(record.getId());
+            dto.setDate(record.getDate());
+            dto.setClockIn(record.getClockIn());
+            dto.setClockOut(record.getClockOut());
+            dto.setWorkingHours(record.getWorkingHours());
+            dto.setStatus(record.getStatus());
+            dto.setLocation(record.getLocation());
+            dto.setCheckInImageUrl(record.getSetCheckInImageUrl());
+            dto.setCheckOutImageUrl(record.getSetCheckOutImageUrl());
+
+            Employee emp = record.getEmployee();
+            if (emp != null) {
+                dto.setEmployeeId(emp.getEmpId());
+                dto.setEmployeeName(emp.getEname());
+            } else {
+                dto.setEmployeeId(null);
+                dto.setEmployeeName("Unknown");
+            }
+
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
+
 
     
     

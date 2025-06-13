@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -59,11 +60,38 @@ public class AttendanceController {
     }
 
     // Get all attendance records: GET /api/attendance/all
+//    @GetMapping("/all")
+//    public ResponseEntity<List<Attendance>> getAllRecords() {
+//        List<Attendance> records = attendanceService.getAllRecords();
+//        return ResponseEntity.ok(records);
+//    }
+    
+ // GET /api/attendance/all
+ // GET /api/attendance/all
     @GetMapping("/all")
-    public ResponseEntity<List<Attendance>> getAllRecords() {
+    public ResponseEntity<List<AttendanceDTO>> getAllRecords() {
         List<Attendance> records = attendanceService.getAllRecords();
-        return ResponseEntity.ok(records);
+
+        List<AttendanceDTO> dtos = records.stream().map(record -> {
+            AttendanceDTO dto = new AttendanceDTO();
+            dto.setId(record.getId());
+            dto.setEmployeeId(record.getEmployee().getEmpId()); // assuming Employee has getId()
+            dto.setEmployeeName(record.getEmployee().getEname()); // assuming Employee has getName()
+            dto.setDate(record.getDate());
+            dto.setClockIn(record.getClockIn());
+            dto.setClockOut(record.getClockOut());
+            dto.setWorkingHours(record.getWorkingHours());
+            dto.setStatus(record.getStatus());
+            dto.setLocation(record.getLocation());
+            dto.setCheckInImageUrl(record.getSetCheckInImageUrl());
+            dto.setCheckOutImageUrl(record.getSetCheckOutImageUrl());
+            return dto;
+        }).collect(Collectors.toList());
+
+        return ResponseEntity.ok(dtos);
     }
+
+    
 
     // Get attendance records by employee: GET /api/attendance/employee/{userId}
 //    @GetMapping("/employee/{userId}")
@@ -91,16 +119,16 @@ public class AttendanceController {
     }
 
     // Get record by employee and date: GET /api/attendance/record/{userId}/{date}
-    @GetMapping("/record/{userId}/{date}")
-    public ResponseEntity<List<AttendanceDTO>> getRecordByEmployeeAndDate(
-            @PathVariable Integer userId,
-            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-
-        Employee employee = new Employee();
-        employee.setEmpId(userId);
-        List<AttendanceDTO> record = attendanceService.getRecordByEmployeeAndDate(employee, date);
-        return ResponseEntity.ok(record);
-    }
+//    @GetMapping("/record/{userId}/{date}")
+//    public ResponseEntity<List<AttendanceDTO>> getRecordByEmployeeAndDate(
+//            @PathVariable Integer userId,
+//            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+//
+//        Employee employee = new Employee();
+//        employee.setEmpId(userId);
+//        List<AttendanceDTO> record = attendanceService.getRecordByEmployeeAndDate(employee, date);
+//        return ResponseEntity.ok(record);
+//    }
 
     // Get weekly records by employee: GET /api/attendance/weekly/{userId}?start=yyyy-MM-dd&end=yyyy-MM-dd
     @GetMapping("/weekly/{userId}")
@@ -157,7 +185,7 @@ public class AttendanceController {
         employee.setEmpId(empId);
 
         LocalDate today = LocalDate.now();
-        List<AttendanceDTO> records = attendanceService.getRecordByEmployeeAndDate(employee, today);
+        List<AttendanceDTO> records = attendanceService.getByEmployeeAndDate(employee, today);
 
         Map<String, Object> status = new HashMap<>();
 

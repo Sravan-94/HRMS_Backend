@@ -9,7 +9,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.Data;
 
@@ -45,4 +44,13 @@ public class Attendance {
     @JsonIgnoreProperties("attendances") // ignore the 'attendances' list in Employee
     private Employee employee;
 
-	private String setCheckOutImageUrl;}
+	private String setCheckOutImageUrl;
+	
+	
+	 private Integer employeeId;         // You can replace with String if you're using email or something else
+	    private String employeeName;
+		private Double workingHours;
+	
+	
+
+	}
